@@ -1,0 +1,45 @@
+{
+  "name": "World Is Your Study",
+  "short_name": "WIYS",
+  "description": "Real study time builds your own 3D city. Compete with friends in weekly leagues.",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1a26",
+  "theme_color": "#0e1a26",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start studying",
+      "url": "./#study"
+    },
+    {
+      "name": "My World",
+      "url": "./#world"
+    }
+  ]
+}

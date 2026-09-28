@@ -1,0 +1,46 @@
+rules_version = '2';
+// WORLD IS YOUR STUDY — paste this whole file into Firebase console → Firestore Database → Rules → Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me(uid) { return signedIn() && request.auth.uid == uid; }
+    function small() { return request.resource.size() < 200000; }
+
+    // Your private progress. Only you can read or change it.
+    match /users/{uid} {
+      allow read: if me(uid);
+      allow write: if me(uid) && small();
+      match /logs/{month} {
+        allow read, write: if me(uid);
+      }
+    }
+
+    // Public player card (name, level, league, weekly XP). Only the owner can change it.
+    match /players/{uid} {
+      allow read: if signedIn();
+      allow write: if me(uid) && small();
+      allow create: if signedIn() && uid.matches('demo-.*') && request.resource.data.demo == true;
+
+      // City, stats, feed, challenges: only the owner and people they added as friends can read.
+      match /detail/{doc} {
+        allow read: if me(uid)
+          || get(/databases/$(database)/documents/players/$(uid)).data.get('demo', false) == true
+          || request.auth.uid in get(/databases/$(database)/documents/players/$(uid)).data.get('friends', []);
+        allow write: if me(uid) && small();
+        allow create: if signedIn() && uid.matches('demo-.*');
+      }
+    }
+
+    // Usernames can be claimed once and never taken over.
+    match /usernames/{name} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /config/{doc} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+  }
+}
