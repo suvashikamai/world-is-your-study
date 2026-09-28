@@ -1,3 +1,5 @@
+
+App · JS
 /* ============ Firebase wiring: auth, live data, actions, PWA ============ */
 const CFG = window.FIREBASE_CONFIG || {};
 const OPT = Object.assign({ useServer: false, functionsRegion: 'asia-south1' }, window.WIYS || {});
@@ -5,13 +7,13 @@ const SYNTH = '@wiys.example.com';
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 G.useServer = !!OPT.useServer;
 G.tzMin = -new Date().getTimezoneOffset();
-
+ 
 let fs = null, fns = null, auth = null, F = null;          // Firebase handles
 let unsubs = [];                                           // listeners for the signed-in user
 let pending = 0, latestServerState = null;                 // optimistic-update bookkeeping
 let baseDocs = {}, detailDocs = {}; const detailSubs = new Map();
 const clean = (o) => JSON.parse(JSON.stringify(o));
-
+ 
 /* ---------- actions ---------- */
 function runLocal(name, args) {
   try { const res = applyAction(name, args); return { ok: true, res }; }
@@ -39,7 +41,7 @@ function act(name, args = {}) {
   args = Object.assign({}, args, { tz: G.tzMin });
   const authoritative = AUTH_ACTIONS.includes(name);
   if (G.offline) { const r = runLocal(name, args); render(); return authoritative ? Promise.resolve(r) : r; }
-
+ 
   if (!G.useServer && name === 'register') {
     return (async () => {
       const u = String(args.username || '').toLowerCase();
@@ -59,7 +61,7 @@ function act(name, args = {}) {
     render();
     return authoritative ? Promise.resolve(r) : r;
   }
-
+ 
   if (authoritative) {
     pending++;
     return callServer(name, args).then((d) => {
@@ -87,7 +89,7 @@ function flushServerState() {
   G.S = deepMergeState(newState(), latestServerState); latestServerState = null;
   rebuildPlayers(); softRender();
 }
-
+ 
 /* client mode (no Cloud Functions): write my own documents */
 let writeChain = Promise.resolve();
 function persistClient(name, args, res) {
@@ -105,7 +107,7 @@ function persistClient(name, args, res) {
   });
   return writeChain;
 }
-
+ 
 /* ---------- live data ---------- */
 function rebuildPlayers() {
   const out = {};
@@ -128,7 +130,7 @@ function syncDetailSubs() {
   }
 }
 function syncTeamChallengesClient() { /* client mode: let a partner's progress finish a team challenge */ if (G.S && G.S.profile) { const before = JSON.stringify(G.S.social.chState); syncTeamChallenges(); if (JSON.stringify(G.S.social.chState) !== before) persistClient('sync', {}, null); } }
-
+ 
 function listen(uid) {
   const { doc, collection, query, limit, onSnapshot } = F;
   unsubs.push(onSnapshot(doc(fs, 'users', uid), (s) => {
@@ -160,7 +162,7 @@ async function seedDemo() {
   }
 }
 function stopListening() { unsubs.forEach((f) => f()); unsubs = []; for (const off of detailSubs.values()) off(); detailSubs.clear(); baseDocs = {}; detailDocs = {}; }
-
+ 
 /* ---------- auth ---------- */
 window.AUTH = {
   async signUp(username, password) {
@@ -175,7 +177,7 @@ window.AUTH = {
   },
   async signOut() { stopListening(); await F.signOut(auth); },
 };
-
+ 
 /* ---------- soft render (don't clobber a field the player is typing in) ---------- */
 let renderQueued = false;
 function softRender() {
@@ -186,7 +188,7 @@ function softRender() {
 }
 window.softRender = softRender;
 document.addEventListener('focusout', () => { if (G.pendingRender) { G.pendingRender = false; setTimeout(softRender, 60); } });
-
+ 
 /* ---------- boot ---------- */
 async function boot() {
   const configured = CFG.apiKey && !/^YOUR/.test(CFG.apiKey);
@@ -199,6 +201,15 @@ async function boot() {
   F = Object.assign({}, a, f, fn);
   const fbApp = app.initializeApp(CFG);
   auth = a.getAuth(fbApp);
+  // Explicitly pin login persistence to this browser (survives refresh, tab close, and
+  // browser restart) instead of relying on the SDK's automatic default, which some
+  // browsers/extensions quietly override. Try IndexedDB first (best), fall back to
+  // localStorage if IndexedDB is blocked.
+  try { await a.setPersistence(auth, a.indexedDBLocalPersistence); }
+  catch (e1) {
+    try { await a.setPersistence(auth, a.browserLocalPersistence); }
+    catch (e2) { console.warn('auth persistence unavailable, session will not survive refresh', e2); }
+  }
   try { fs = f.initializeFirestore(fbApp, { localCache: f.persistentLocalCache({ tabManager: f.persistentMultipleTabManager() }) }); }
   catch (e) { fs = f.getFirestore(fbApp); }
   fns = fn.getFunctions(fbApp, OPT.functionsRegion);
@@ -213,7 +224,7 @@ async function boot() {
     render(); listen(user.uid);
   });
 }
-
+ 
 /* ---------- keep day-based numbers fresh ---------- */
 let lastDay = null;
 setInterval(() => { if (!G.S || !G.S.profile) return; const k = dayKey(); if (lastDay && k !== lastDay) { if (!G.offline) act('sync'); softRender(); } lastDay = k; }, 30000);
@@ -221,11 +232,12 @@ window.addEventListener('hashchange', () => { const h = location.hash.slice(1); 
 window.addEventListener('online', () => { G.netDown = false; softRender(); });
 window.addEventListener('offline', () => { G.netDown = true; softRender(); });
 G.netDown = navigator.onLine === false;
-
+ 
 /* ---------- PWA: service worker + install button ---------- */
 G.standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); G.installPrompt = e; softRender(); });
 window.addEventListener('appinstalled', () => { G.installPrompt = null; G.standalone = true; toast('Installed! Open it from your home screen.', 'info'); });
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch((e) => console.warn('sw', e));
-
+ 
 boot().catch((e) => { console.error(e); document.getElementById('app').innerHTML = `<div class="splash"><div><h2>Couldn’t start</h2><p class="muted">${esc(e.message || e)}</p></div></div>`; });
+ 
