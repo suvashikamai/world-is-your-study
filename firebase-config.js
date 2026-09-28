@@ -2,12 +2,12 @@
  * Paste your Firebase web config here (Firebase console → Project settings → Your apps → Web app → Config).
  */
 window.FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR-PROJECT-ID.firebaseapp.com",
-  projectId: "YOUR-PROJECT-ID",
-  storageBucket: "YOUR-PROJECT-ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBF-RDycofyt1J5amwY9vd30kJ_NbpqqNQ",
+  authDomain: "world-is-your-study.firebaseapp.com",
+  projectId: "world-is-your-study",
+  storageBucket: "world-is-your-study.firebasestorage.app",
+  messagingSenderId: "840297393157",
+  appId: "1:840297393157:web:ceaad4c9d243991d18c06c"
 };
 
 /* Free plan setup: the app saves straight to your Firestore database. */
