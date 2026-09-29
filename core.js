@@ -1,7 +1,7 @@
 /* WORLD IS YOUR STUDY — shared game core. Loaded by the web app AND by Cloud Functions (functions/core.js is a copy made at deploy). */
 /* ============ WORLD IS YOUR STUDY — content & economy data ============ */
 'use strict';
-const APP_VERSION = 1;
+const APP_VERSION = 1; 
 
 /* ---- Economy constants (tune here) ---- */
 const ECON = {
