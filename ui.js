@@ -470,7 +470,7 @@ VIEWS.world = () => {
   </div>`;
 };
 function reqRow(l, have, need, cls){ const ok=have>=need; return `<div><div class="row spread small"><span>${l}</span><span class="num ${ok?'':'muted'}">${fmtNum(have)} / ${fmtNum(need)} ${ok?'✓':''}</span></div>${bar(Math.min(100,have/need*100),cls+' thin')}</div>`; }
-function publicCity(p){ if(!p || !p.city || p.city.hidden) return {th:(p&&p.th)||1, b:[], flag:'#ccc'}; return {th:p.city.th, flag:p.city.flag, b:(p.city.b||[]).map(a=>({u:a[0]+a[1]+'_'+a[2], id:a[0], x:a[1], z:a[2], r:a[3], done:a[4]!==0}))}; }
+function publicCity(p){ if(!p || !p.city || p.city.hidden) return {th:(p&&p.th)||1, b:[], flag:'#ccc'}; return {th:p.city.th, flag:p.city.flag, b:(p.city.b||[]).map(a=>Array.isArray(a)?{u:a[0]+a[1]+'_'+a[2], id:a[0], x:a[1], z:a[2], r:a[3], done:a[4]!==0}:{u:a.i+a.x+'_'+a.z, id:a.i, x:a.x, z:a.z, r:a.r, done:a.d!==0})}; }
 
 function mountWorldPanel(){
   const wp=$('#worldPanel');

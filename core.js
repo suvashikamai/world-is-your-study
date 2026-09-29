@@ -819,7 +819,7 @@ function buildPublic(){
     week:{key:weekKey(), xp:w.xp, min:w.min, tasks:w.tasks, days:w.days},
     lastWeek:{key:weekKey(prevWk), xp:weekAgg(prevWk).xp},
     stats: pr.stats ? {totalMin:S.stats.totalMin, sessions:S.stats.sessions, tasksDone:S.stats.tasksDone, consistency:consistency(30).pct, challengesDone:S.stats.challengesDone} : null,
-    city: pr.city ? {th:S.city.th, b:S.city.b.map(b=>[b.id,b.x,b.z,b.r||0,b.done===false?0:1]), flag:S.city.flag, pop:cs.population} : {th:S.city.th, hidden:true, pop:cs.population},
+    city: pr.city ? {th:S.city.th, b:S.city.b.map(b=>({i:b.id, x:b.x, z:b.z, r:b.r||0, d:b.done===false?0:1})), flag:S.city.flag, pop:cs.population} : {th:S.city.th, hidden:true, pop:cs.population},
     friends:S.social.friends, declined:S.social.declined, chOut:S.social.chOut, chState:S.social.chState,
     feed:S.social.feed.slice(0,20), reactions:S.social.reactions,
     studying: (pr.studying && S.active && !S.active.pausedAt) ? {since:S.active.startedAt, subj:(S.subjects.find(s=>s.id===S.active.subjectId)||{}).name||'General'} : null,

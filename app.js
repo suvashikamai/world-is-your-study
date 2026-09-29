@@ -92,7 +92,7 @@ function flushServerState() {
 let writeChain = Promise.resolve();
 function persistClient(name, args, res) {
   const uid = G.uid; const S = clean(G.S);
-  writeChain = writeChain.then(async () => {
+  const run = async () => {
     const { doc, setDoc, getDoc, arrayUnion } = F;
     S.tz = G.tzMin;
     await setDoc(doc(fs, 'users', uid), S);
@@ -102,7 +102,10 @@ function persistClient(name, args, res) {
       await setDoc(doc(fs, 'players', uid, 'detail', 'main'), clean(detail));
     }
     if (res && res.log) await setDoc(doc(fs, 'users', uid, 'logs', monthKey()), { s: arrayUnion(clean(res.log)) }, { merge: true });
-  });
+  };
+  // A failed save must never block later saves: recover from any earlier
+  // rejection in the chain before attempting this one.
+  writeChain = writeChain.catch(() => {}).then(run);
   return writeChain;
 }
 
