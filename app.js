@@ -20,7 +20,7 @@ function runLocal(name, args) {
 async function callServer(name, args) {
   const call = F.httpsCallable(fns, 'act');
   const r = await call({ name, args });
-  if (r.data && r.data.now) G.skew = r.data.now - Date.now();
+  if (r.data && r.data.now) G.skew= r.data.now - Date.now();
   return r.data;
 }
 function serverErr(e) {
