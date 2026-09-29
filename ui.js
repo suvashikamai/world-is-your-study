@@ -24,7 +24,7 @@ function openModal(html, cls='', onClose){
   const bg=document.createElement('div'); bg.className='modal-bg'; bg.id='modalbg';
   bg.innerHTML=`<div class="modal ${cls}" role="dialog" aria-modal="true">${html}</div>`;
   bg.addEventListener('click',e=>{ if(e.target===bg && !bg.dataset.lock) closeModal(); });
-  $('#modal-root').appendChild(bg); modalOnClose=onClose||null;
+  $('#modal-root').appendChild(bg); modalOnClose=onClose||null; 
   const f=bg.querySelector('[autofocus]'); if(f) setTimeout(()=>f.focus(),30);
 }
 function closeModal(silent){ const m=$('#modalbg'); if(m) m.remove(); const cb=modalOnClose; modalOnClose=null; if(cb && !silent) cb(); }
